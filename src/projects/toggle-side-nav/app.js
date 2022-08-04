@@ -1,9 +1,3 @@
-// do something!
-// 페이지 읽어들일 때,
-// toggle 상태가 있으면 get하고, 없으면 false로 set
-// get한 상태를 기반으로 토글에 .active 추가
-// unload 될 때 localStorage setItem -> 지원하지 않는 브라우저이거나, 브라우저가 crash 됐을 때 안 먹힐 수 있음
-
 const ACTIVE_CLASS_KEY = 'navActive';
 const nav = document.querySelector('nav');
 const toggleBtn = document.querySelector('.toggle');
@@ -23,21 +17,23 @@ const setNavState = () => {
   }
 };
 
-const toggleNav = (e) => {
+const toggleNav = () => {
+  if (document.body.className.includes('preload')) {
+    document.body.classList.remove('preload');
+  }
   if (nav.className.includes('active')) {
     nav.classList.remove('active');
     localStorage.setItem(ACTIVE_CLASS_KEY, 'false');
   } else {
     nav.classList.add('active');
     localStorage.setItem(ACTIVE_CLASS_KEY, 'true');
-    console.log('hi');
   }
 };
 
 const init = () => {
   window.addEventListener('DOMContentLoaded', setNavState);
-  document.body.style.visibility = 'unset';
   toggleBtn.addEventListener('click', toggleNav);
+  document.body.style.visibility = 'unset';
 };
 
 init();
