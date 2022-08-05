@@ -1,30 +1,49 @@
-// 별점이 저장되어있지 않을 때
-// 별점이 저장되어 있을 때
 const starOnEnter = el => {
-  // TODO selected인지 아닌지 판별
-  el.classList.add('hovered');
+  if (!el.classList.contains('selected')) {
+    el.classList.add('hovered');
+  }
 };
 
 const starOnLeave = el => {
-  // TODO selected인지 아닌지 판별
   el.classList.remove('hovered');
 };
 
-const ratingHandler = e => {
-  // onclick이 되면, elem.dispatchEvent(new CustomEvent detail {rating: idx})
-  if (!e.target.classList.contains('bxs-star')) return;
+const starOnSelect = el => {
+  el.classList.remove('hovered');
+  el.classList.add('selected');
+};
 
+const starOnChange = el => {
+  el.classList.remove('selected');
+};
+
+const starRatingHandler = e => {
+  if (!e.target.classList.contains('bxs-star')) return;
+  const { starIdx } = e.target.dataset;
   const ratingChange = new CustomEvent('rating-change', {
     bubbles: true,
     detail: {
-      rating: e.target.dataset.starIdx
+      rating: starIdx
     }
   });
 
   e.target.dispatchEvent(ratingChange);
+  const container = e.target.closest('.star-rating-container');
+
+  if (container.hasChildNodes()) {
+    const childrens = container.childNodes;
+
+    childrens.forEach((el, idx) => {
+      if (idx < starIdx) {
+        starOnSelect(el);
+      } else {
+        starOnChange(el);
+      }
+    });
+  }
 };
 
-const starOnMouseOver = e => {
+const starMouseoverHandler = e => {
   const idx = e.target.dataset.starIdx;
   if (!idx) return;
 
@@ -38,7 +57,7 @@ const starOnMouseOver = e => {
   }
 };
 
-const starOnMouseout = e => {
+const starMouseoutHandler = e => {
   const targetFrom = e.target;
   const targetTo = e.relatedTarget;
 
@@ -75,9 +94,9 @@ const StarRating = $container => {
 
   $container.append(starRatingContainer);
 
-  starRatingContainer.addEventListener('mouseover', starOnMouseOver);
-  starRatingContainer.addEventListener('mouseout', starOnMouseout);
-  starRatingContainer.addEventListener('click', ratingHandler);
+  starRatingContainer.addEventListener('mouseover', starMouseoverHandler);
+  starRatingContainer.addEventListener('mouseout', starMouseoutHandler);
+  starRatingContainer.addEventListener('click', starRatingHandler);
 };
 
 export default StarRating;
