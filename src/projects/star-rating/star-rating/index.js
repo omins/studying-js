@@ -1,6 +1,5 @@
 // 별점이 저장되어있지 않을 때
 // 별점이 저장되어 있을 때
-
 const starOnEnter = el => {
   // TODO selected인지 아닌지 판별
   el.classList.add('hovered');
@@ -9,6 +8,20 @@ const starOnEnter = el => {
 const starOnLeave = el => {
   // TODO selected인지 아닌지 판별
   el.classList.remove('hovered');
+};
+
+const ratingHandler = e => {
+  // onclick이 되면, elem.dispatchEvent(new CustomEvent detail {rating: idx})
+  if (!e.target.classList.contains('bxs-star')) return;
+
+  const ratingChange = new CustomEvent('rating-change', {
+    bubbles: true,
+    detail: {
+      rating: e.target.dataset.starIdx
+    }
+  });
+
+  e.target.dispatchEvent(ratingChange);
 };
 
 const starOnMouseOver = e => {
@@ -64,6 +77,7 @@ const StarRating = $container => {
 
   starRatingContainer.addEventListener('mouseover', starOnMouseOver);
   starRatingContainer.addEventListener('mouseout', starOnMouseout);
+  starRatingContainer.addEventListener('click', ratingHandler);
 };
 
 export default StarRating;
