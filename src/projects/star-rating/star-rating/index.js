@@ -19,7 +19,7 @@ const starOnMouseOver = e => {
 
   if (container.hasChildNodes()) {
     const childrens = container.childNodes;
-    for (let i = 0; i <= idx; i++) {
+    for (let i = 0; i < idx; i++) {
       starOnEnter(childrens[i]);
     }
   }
@@ -53,7 +53,7 @@ const StarRating = $container => {
   const starRatingContainer = document.createElement('div');
   starRatingContainer.className = 'star-rating-container';
 
-  for (let i = 0; i < maxRating; i++) {
+  for (let i = 1; i <= maxRating; i++) {
     const star = document.createElement('i');
     star.dataset.starIdx = i;
     star.className = 'bx bxs-star';
