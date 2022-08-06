@@ -1,6 +1,11 @@
 import key from './apiKey.js';
 
 const { API_KEY } = key;
+const root = document.querySelector('#root');
+
+let page;
+let category = '';
+let pageSize = 0;
 
 const getNews = async (category, page, pageSize) => {
   const URL = `https://newsapi.org/v2/top-headlines?country=kr&category=${category}&page=${page}&pageSize=${pageSize}&apiKey=${API_KEY}`;
@@ -8,8 +13,12 @@ const getNews = async (category, page, pageSize) => {
   try {
     const news = await axios.get(URL);
     return news.data;
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    if (err.response.status === 429) {
+      alert('API Key를 변경해주세요.');
+    } else {
+      alert(err.message);
+    }
   }
 };
 
@@ -39,29 +48,95 @@ const renderNews = item => {
   newsList.appendChild(newsItem);
 };
 
-const NewsList = () => {
-  const root = document.querySelector('#root');
+const removeScrollObserver = msgNeeded => {
+  const scrollObserver = document.querySelector('.scroll-observer');
+  if (scrollObserver) {
+    scrollObserver.remove();
+  }
 
-  const newsListContainer = document.createElement('div');
-  newsListContainer.className = 'news-list-container';
-  newsListContainer.innerHTML = '<article class="news-list"></article>';
+  if (msgNeeded) {
+    const prevMsg = document.querySelector('.end-api-msg');
 
-  const scrollObserver = document.createElement('div');
-  scrollObserver.className = 'scroll-observer';
-  scrollObserver.innerHTML = '<img src="img/ball-triangle.svg" alt="Loading..." />';
+    if (!prevMsg) {
+      const newsListContainer = document.querySelector('.news-list-container');
+      const msg = document.createElement('p');
+      msg.className = 'end-api-msg';
+      msg.style.fontSize = '20px';
+      msg.style.textAlign = 'center';
+      msg.innerText = 'End of API Requests for this page';
 
-  root.appendChild(newsListContainer);
-  root.appendChild(scrollObserver);
+      newsListContainer.appendChild(msg);
+    }
+  }
+};
 
-  const category = 'general';
-  const page = 2;
-  const pageSize = 5;
+const handleIntersect = () => {
+  if (page <= 20) {
+    page++;
+
+    getNews(category, page, pageSize).then(data => {
+      const { articles } = data;
+
+      if (articles.length > 0) {
+        articles.forEach(item => {
+          renderNews(item);
+        });
+      } else {
+        removeScrollObserver(true);
+      }
+    }).catch(err => console.log(err.message));
+  }
+};
+
+const createObserver = () => {
+  const scrollObserver = document.querySelector('.scroll-observer');
+
+  const options = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0
+  };
+
+  const observer = new IntersectionObserver(handleIntersect, options);
+  observer.observe(scrollObserver);
+};
+
+const NewsList = props => {
+  category = props.category;
+  page = props.page;
+  pageSize = props.pageSize;
+
+  const prevNews = document.querySelector('.news-list-container > .news-list');
+  const prevMsg = document.querySelector('.end-api-msg');
+
+  if (prevNews) {
+    while (prevNews.firstChild) {
+      prevNews.removeChild(prevNews.firstChild);
+    }
+    if (prevMsg) {
+      prevMsg.remove();
+    }
+    removeScrollObserver(false);
+  } else {
+    const newsListContainer = document.createElement('div');
+    newsListContainer.className = 'news-list-container';
+    newsListContainer.innerHTML = '<article class="news-list"></article>';
+    root.appendChild(newsListContainer);
+  }
 
   getNews(category, page, pageSize).then(data => {
     const { articles } = data;
     articles.forEach(item => {
       renderNews(item);
     });
-  });
+
+    const scrollObserver = document.createElement('div');
+    const newsListContainer = document.querySelector('.news-list-container');
+    scrollObserver.className = 'scroll-observer';
+    scrollObserver.innerHTML = '<img src="img/ball-triangle.svg" alt="Loading..." />';
+    newsListContainer.appendChild(scrollObserver);
+
+    createObserver();
+  }).catch(err => console.log(err.message));
 };
 export default NewsList;
