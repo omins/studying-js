@@ -35,31 +35,28 @@ if (f) {
   console.log("This will never be executed if const f is false");
 }
 
-// 참조 타입
 // Reference types
-
 const obj = {
   name: "omin",
   weight: "70kg",
 };
+console.log(obj);
+
+obj.phoneNum = "010-1234-5678";
+console.log(obj);
 
 const arr = [1, 2, 3, 4];
 function func() {}
 
-console.log(obj instanceof Object);
-console.log(arr instanceof Object);
-console.log(func instanceof Object);
+console.log(obj instanceof Object); // true
+console.log(arr instanceof Object); // true
+console.log(func instanceof Object); // true
 
-// 느슨해서 타입에 많은 신경을 써야 함
-obj.phoneNum = "010-1234-5678";
-console.log(obj);
-// 주소를 갖고 호출만 하고 있음
-
+// Safe Integer
 console.log(Number.MAX_SAFE_INTEGER);
 console.log(Number.MIN_SAFE_INTEGER);
 
 // undefined와 null의 차이
-
 typeof null; // "object" (하위호환 유지를 위해 "null"이 아님)
 typeof undefined; // "undefined"
 null === undefined; // false
@@ -76,29 +73,19 @@ const nullValue = null;
 console.log(nullValue); // null
 
 let undefinedValue;
-console.log(undefinedValue);
+console.log(undefinedValue); //undefined
 
-// let x;
-// if (x === undefined) {
-//   console.log("x is undefined");
-// } else {
-//   console.log(`x is ${x}`);
-// }
 
-// Bigint 선언
+// Bigint
 const withCon = BigInt("9007199254740992");
 const withOutCon = 9007199254740992n;
 
 console.log(withCon);
 console.log(withOutCon);
 
-const x = 2n ** 53n; // 9007199254740992n
-const y = x ** 2n; // 9007199254740993n
-
-// const z = y + 1; // TypeError: Cannot mix BigInt and other types, use explicit conversions
-console.log(y);
-const z = Number.parseInt(y);
-console.log(z);
+const x = 2n ** 53n;
+console.log(x);
+// const y = x + 1; // TypeError: Cannot mix BigInt and other types, use explicit conversions
 
 // Symbol
 const id = Symbol("id");
@@ -110,6 +97,5 @@ const objWithSymbol = {
   [id]: "helloOminId",
 };
 
-console.log(objWithSymbol[id]);
-
-console.log(id == id2);
+console.log(objWithSymbol[id]); // helloOminId
+console.log(id === id2); // false
